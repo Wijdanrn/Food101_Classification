@@ -1,0 +1,26 @@
+# Core
+streamlit>=1.33.0
+numpy
+pandas
+
+# ML
+scikit-learn
+onnxruntime
+torch
+torchvision
+transformers
+
+# Image Processing
+Pillow
+opencv-python
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Utils
+tqdm
+regex
+
+huggingface-hub
