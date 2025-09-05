@@ -9,7 +9,7 @@ import requests
 from pathlib import Path
 import plotly.express as px
 import pandas as pd
-
+from huggingface_hub import hf_hub_download
 
 st.set_page_config(
     page_title="Klasifikasi 101 Makanan",
@@ -70,18 +70,24 @@ CLASS_NAMES = [
             "waffles"
         ]
 class Food101Classifier:
-    def __init__(self, model_path="food101_resnet50.onnx"):
-        self.model_path = model_path
+    def __init__(self, repo_id="Wijdanadam/Food101_Classification", filename="food101_resnet50.onnx"):
+        self.repo_id = repo_id
+        self.filename = filename
         self.session = None
         self.class_names = CLASS_NAMES
         self.input_type = None
         self.load_model()
 
     def load_model(self):
+        model_path = hf_hub_download(
+            repo_id=self.repo_id,
+            filename=self.filename
+        )
         providers = ['CPUExecutionProvider']
         if 'CUDAExecutionProvider' in ort.get_available_providers():
             providers.insert(0, 'CUDAExecutionProvider')
-        self.session = ort.InferenceSession(self.model_path, providers=providers)
+
+        self.session = ort.InferenceSession(model_path, providers=providers)
         self.input_name = self.session.get_inputs()[0].name
         self.output_name = self.session.get_outputs()[0].name
         self.input_shape = self.session.get_inputs()[0].shape
@@ -248,3 +254,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
