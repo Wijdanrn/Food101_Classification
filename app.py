@@ -171,7 +171,7 @@ def display_prediction_results(results, inference_time):
 def main():
     st.markdown('<h1 class="main-header">Klasifikasi 101 Makanan</h1>', unsafe_allow_html=True)
     st.markdown('<h5 class="main-header">dengan model ResNet50</h5>', unsafe_allow_html=True)
-    st.markdown('<h7 class="main-header">(masih dalam tahap pengembangan)</h7>', unsafe_allow_html=True)
+    st.markdown('<h5 class="main-header">(masih dalam tahap pengembangan)</h5>', unsafe_allow_html=True)
 
     st.image(
             "https://storage.googleapis.com/kaggle-datasets-images/2918922/5029790/277a9147ec4854e4762767c8bd107bec/dataset-cover.png?t=2023-02-20-08-37-14",
@@ -254,4 +254,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
