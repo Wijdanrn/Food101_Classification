@@ -167,92 +167,90 @@ def display_prediction_results(results, inference_time):
         ])
         st.dataframe(df, use_container_width=True, hide_index=True)
 
+st.markdown('<h1 class="main-header">Klasifikasi 101 Makanan</h1>', unsafe_allow_html=True)
+st.markdown('<h5 class="main-header">dengan model ResNet50</h5>', unsafe_allow_html=True)
+st.markdown('<h5 class="main-header">(masih dalam tahap pengembangan)</h5>', unsafe_allow_html=True)
 
-def main():
-    st.markdown('<h1 class="main-header">Klasifikasi 101 Makanan</h1>', unsafe_allow_html=True)
-    st.markdown('<h5 class="main-header">dengan model ResNet50</h5>', unsafe_allow_html=True)
-    st.markdown('<h5 class="main-header">(masih dalam tahap pengembangan)</h5>', unsafe_allow_html=True)
+st.image(
+        "https://storage.googleapis.com/kaggle-datasets-images/2918922/5029790/277a9147ec4854e4762767c8bd107bec/dataset-cover.png?t=2023-02-20-08-37-14",
+        caption="Food-101 Dataset (Bossard et al., 2014)",
+        use_container_width=True
+    )
 
-    st.image(
-            "https://storage.googleapis.com/kaggle-datasets-images/2918922/5029790/277a9147ec4854e4762767c8bd107bec/dataset-cover.png?t=2023-02-20-08-37-14",
-            caption="Food-101 Dataset (Bossard et al., 2014)",
-            use_container_width=True
-        )
-    
-    with st.sidebar:
-        classifier = load_classifier()
-        st.markdown(f"""
-        <div class="sidebar-info">
-            <b>Model:</b> ResNet50<br>
-            <b>Kelas:</b> 101<br>
-            <b>Ukuran input:</b> 224×224<br>
-            <b>Runtime:</b> ONNX Runtime<br>
-        </div>
-        """, unsafe_allow_html=True)
-        providers = classifier.session.get_providers()
-        st.success(f"Model loaded ({'GPU' if 'CUDAExecutionProvider' in providers else 'CPU'})")
-        st.info(f"Input type: {classifier.input_type}")
-        top_k = st.slider("Top-K Predictions", 1, 10, 5)
-        show_original = st.checkbox("Tampilkan gambar asli", True)
+with st.sidebar:
+    classifier = load_classifier()
+    st.markdown(f"""
+    <div class="sidebar-info">
+        <b>Model:</b> ResNet50<br>
+        <b>Kelas:</b> 101<br>
+        <b>Ukuran input:</b> 224×224<br>
+        <b>Runtime:</b> ONNX Runtime<br>
+    </div>
+    """, unsafe_allow_html=True)
+    providers = classifier.session.get_providers()
+    st.success(f"Model loaded ({'GPU' if 'CUDAExecutionProvider' in providers else 'CPU'})")
+    st.info(f"Input type: {classifier.input_type}")
+    top_k = st.slider("Top-K Predictions", 1, 10, 5)
+    show_original = st.checkbox("Tampilkan gambar asli", True)
 
-        st.markdown("## List Makanan")
+    st.markdown("## List Makanan")
 
-        cols = st.columns(13)
+    cols = st.columns(13)
 
-        available_letters = sorted(set(name[0].upper() for name in CLASS_NAMES))
+    available_letters = sorted(set(name[0].upper() for name in CLASS_NAMES))
 
-        selected = st.session_state.get("selected_letter", None)
+    selected = st.session_state.get("selected_letter", None)
 
-        for i, letter in enumerate(available_letters):
-            if cols[i % 13].button(letter):
-                st.session_state["selected_letter"] = letter
-                selected = letter
+    for i, letter in enumerate(available_letters):
+        if cols[i % 13].button(letter):
+            st.session_state["selected_letter"] = letter
+            selected = letter
 
-        if selected:
-            filtered = [name for name in CLASS_NAMES if name[0].upper() == selected]
-        else:
-            filtered = CLASS_NAMES
-
-        st.markdown(
-            "<div style='height:400px; overflow-y:auto;'>"
-            + "<br>".join(f"- {name.replace('_',' ').title()}" for name in filtered)
-            + "</div>",
-            unsafe_allow_html=True
-        )
-
-
-    st.markdown("## Upload gambar makanan")
-    uploaded_file = st.file_uploader("Pilih gambar...", type=['jpg', 'jpeg', 'png'])
-
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            st.markdown("### Input Image")
-            if show_original:
-                st.image(image, caption="Ukuran Asli", use_container_width=True)
-            else:
-                st.image(image.convert('RGB').resize((224, 224)), caption="Ukuran untuk di-input", use_container_width=True)
-        with col2:
-            if st.button("Mulai klasifikasi", type="primary"):
-                results, inference_time = classifier.predict(image, top_k=top_k)
-                display_prediction_results(results, inference_time)
-        with st.expander("Informasi Gambar"):
-            st.write(f"**Format:** {image.format}")
-            st.write(f"**Ukuran:** {image.size}")
-            st.write(f"**Mode:** {image.mode}")
+    if selected:
+        filtered = [name for name in CLASS_NAMES if name[0].upper() == selected]
     else:
-        with st.expander("Asal-Usul Dataset"):
-            st.write("""
-            Dataset Food-101 adalah tolak ukur yang signifikan dalam bidang pengenalan gambar makanan. Dataset ini diperkenalkan oleh Lukas Bossard, Matthieu Guillaumin, dan Luc Van Gool pada tahun 2014 untuk mengatasi kurangnya basis data publik yang menantang dan realistis untuk tugas pengenalan makanan. Total dataset terdiri dari 101.000 gambar yang terbagi dalam 101 kategori makanan berbeda.
-            """)
+        filtered = CLASS_NAMES
 
-        with st.expander("Format yang bisa di-upload"):
-            st.write("""
-            JPG/JPEG atau PNG
-            """)
+    st.markdown(
+        "<div style='height:400px; overflow-y:auto;'>"
+        + "<br>".join(f"- {name.replace('_',' ').title()}" for name in filtered)
+        + "</div>",
+        unsafe_allow_html=True
+    )
 
-if __name__ == "__main__":
+
+st.markdown("## Upload gambar makanan")
+uploaded_file = st.file_uploader("Pilih gambar...", type=['jpg', 'jpeg', 'png'])
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("### Input Image")
+        if show_original:
+            st.image(image, caption="Ukuran Asli", use_container_width=True)
+        else:
+            st.image(image.convert('RGB').resize((224, 224)), caption="Ukuran untuk di-input", use_container_width=True)
+    with col2:
+        if st.button("Mulai klasifikasi", type="primary"):
+            results, inference_time = classifier.predict(image, top_k=top_k)
+            display_prediction_results(results, inference_time)
+    with st.expander("Informasi Gambar"):
+        st.write(f"**Format:** {image.format}")
+        st.write(f"**Ukuran:** {image.size}")
+        st.write(f"**Mode:** {image.mode}")
+else:
+    with st.expander("Asal-Usul Dataset"):
+        st.write("""
+        Dataset Food-101 adalah tolak ukur yang signifikan dalam bidang pengenalan gambar makanan. Dataset ini diperkenalkan oleh Lukas Bossard, Matthieu Guillaumin, dan Luc Van Gool pada tahun 2014 untuk mengatasi kurangnya basis data publik yang menantang dan realistis untuk tugas pengenalan makanan. Total dataset terdiri dari 101.000 gambar yang terbagi dalam 101 kategori makanan berbeda.
+        """)
+
+    with st.expander("Format yang bisa di-upload"):
+        st.write("""
+        JPG/JPEG atau PNG
+        """)
+            
     main()
+
 
 
