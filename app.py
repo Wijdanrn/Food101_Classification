@@ -250,7 +250,3 @@ else:
         JPG/JPEG atau PNG
         """)
             
-    main()
-
-
-
